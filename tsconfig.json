@@ -12,13 +12,8 @@
 	"noImplicitThis": true,
 	"noImplicitOverride": true,
 	"skipLibCheck": true,
-	"baseUrl": ".",
-	"paths": {
-	  "@": [
-		"./src"
-	  ]
-	},
-	"outDir": "./dist"
+	"outDir": "./dist",
+	"jsx": "react"
   },
   "include": [
 	"./src"

@@ -1,12 +1,9 @@
-import { program } from 'commander';
+import {program} from 'commander';
+import {cmdRename} from "./cmd/rename/index.js";
 
 program
-	.option('--first')
-	.option('-s, --separator <char>');
+	.name('XDean-tools')
+	.version('1.0.0')
+	.addCommand(cmdRename);
 
-program.parse();
-
-const options = program.opts();
-const limit = options.first ? 1 : undefined;
-console.log(options);
-console.log(program.args[0].split(options.separator, limit));
+await program.parseAsync();
