@@ -9,6 +9,7 @@ import {promises as fs} from 'fs';
 type Options = {
 	pattern: RegExp
 	delta: number
+	zero?: number
 }
 
 export const cmdNumAdd = createCommand('num-add')
@@ -17,6 +18,7 @@ export const cmdNumAdd = createCommand('num-add')
 		'pattern to find number. If there is a group $1, it will replace group 1 instead of replace whole matched string',
 		Parse.regexp, /\d+/)
 	.option('-d, --delta <number>', 'number to add', Parse.int)
+	.option('--zero <number>', 'pad zero left', Parse.int)
 	.action(async (paths: string[], opts: Options) => {
 		console.log(`Found ${paths.length} files`);
 		console.log('-'.repeat(process.stdout.columns));
@@ -35,7 +37,8 @@ export const cmdNumAdd = createCommand('num-add')
 					console.log(chalk.red(filePath), `Matched text '${numStr}' is not number`);
 				} else {
 					const newNum = num + opts.delta;
-					const newName = fileName.substring(0, numIdx[0]) + newNum + fileName.substring(numIdx[1]);
+					const newStr = opts.zero === undefined ? String(newNum) : String(newNum).padStart(opts.zero, '0');
+					const newName = fileName.substring(0, numIdx[0]) + newStr + fileName.substring(numIdx[1]);
 					console.log(chalk.green(filePath), `new name: ${newName}`);
 					pathMap.push([filePath, path.join(dirName, newName)]);
 				}
