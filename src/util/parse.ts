@@ -10,7 +10,7 @@ export const Parse = {
 	},
 	regexp: (value: string) => {
 		try {
-			return new RegExp(value);
+			return new RegExp(value, 'd');
 		} catch (e) {
 			throw new InvalidArgumentError(`Not valid regexp: ${String(e)}`);
 		}
