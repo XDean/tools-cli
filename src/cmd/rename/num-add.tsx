@@ -31,7 +31,7 @@ export const cmdNumAdd = createCommand('num-add')
 				console.log(chalk.red(filePath), `no match`);
 			} else {
 				const numStr = match.length === 1 ? match[0] : match[1];
-				const numIdx = match.length === 1 ? match.indices[0] : match.indices[1];
+				const numIdx = match.length === 1 ? match.indices![0] : match.indices![1];
 				const num = Number(numStr);
 				if (Number.isNaN(num)) {
 					console.log(chalk.red(filePath), `Matched text '${numStr}' is not number`);
