@@ -1,5 +1,4 @@
 import {createCommand} from 'commander';
-import {Parse} from '../util/index.js';
 import path from 'path';
 import React from 'react';
 import chalk from 'chalk';
@@ -10,21 +9,25 @@ type Options = {
 	delete: boolean
 }
 
-export const cmdResolveSymbolLink = createCommand('resolve-symbol-link')
+export const cmdResolveLink = createCommand('resolve-link')
 	.argument('<paths...>', 'path (glob) to be renamed')
 	.option('--delete', 'delete origin file', false)
 	.action(async (paths: string[], opts: Options) => {
+		if (paths.length === 0) {
+			cmdResolveLink.outputHelp();
+			return;
+		}
 		console.log(`Found ${paths.length} files`);
 		console.log('-'.repeat(process.stdout.columns));
 		const pathMap: [string, string][] = [];
 		for (const filePath of paths) {
-			const s = await fs.stat(filePath);
-			if (s.isSymbolicLink()) {
-				const real = await fs.realpath(filePath);
-				pathMap.push([filePath, real]);
-				console.log(chalk.green(filePath), '->', chalk.green(real));
+			const nominalPath = path.resolve(filePath);
+			const realPath = await fs.realpath(nominalPath);
+			if (nominalPath !== realPath) {
+				pathMap.push([nominalPath, realPath]);
+				console.log(chalk.green(nominalPath), '->', chalk.green(realPath));
 			} else {
-				console.log(chalk.gray(filePath), 'not a symbol link');
+				console.log(chalk.gray(nominalPath), 'not a link');
 			}
 		}
 		console.log('-'.repeat(process.stdout.columns));
@@ -34,14 +37,14 @@ export const cmdResolveSymbolLink = createCommand('resolve-symbol-link')
 			default: false,
 		});
 		if (confirm) {
-			for (const [symbolPath, realPath] of pathMap) {
-				console.log(symbolPath, chalk.cyan('<-'), realPath);
+			for (const [p, realPath] of pathMap) {
+				console.log(p, chalk.cyan('<-'), realPath);
 				try {
-					await fs.unlink(symbolPath);
+					await fs.unlink(p);
 					if (opts.delete) {
-						await fs.rename(realPath, symbolPath);
+						await fs.rename(realPath, p);
 					} else {
-						await fs.cp(realPath, symbolPath);
+						await fs.cp(realPath, p);
 					}
 				} catch (e) {
 					console.log(chalk.red('ERROR:'), e);
